@@ -53,6 +53,7 @@ function doGet(e) {
     Logger.log('e.queryString: ' + e.queryString);
 
     const path = e.parameter.path;
+    const callback = e.parameter.callback; // JSONP callback
     Logger.log('Extracted path: ' + path);
 
     // Ako nema path parametra, servirati HTML stranicu
@@ -63,118 +64,116 @@ function doGet(e) {
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
     }
 
+    var result;
     if (path === 'login') {
-      return handleLogin(e.parameter.username, e.parameter.password);
+      result = handleLogin(e.parameter.username, e.parameter.password);
     } else if (path === 'stats') {
-      return handleStats(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleStats(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'dashboard') {
-      return handleDashboard(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleDashboard(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'sortimenti') {
-      return handleSortimenti(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleSortimenti(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primaci') {
-      return handlePrimaci(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handlePrimaci(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'otpremaci') {
-      return handleOtpremaci(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleOtpremaci(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'kupci') {
-      return handleKupci(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleKupci(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'odjeli') {
-      return handleOdjeli(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleOdjeli(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primac-detail') {
-      return handlePrimacDetail(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handlePrimacDetail(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'otpremac-detail') {
-      return handleOtpremacDetail(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleOtpremacDetail(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primac-odjeli') {
-      return handlePrimacOdjeli(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.limit);
+      result = handlePrimacOdjeli(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.limit);
     } else if (path === 'otpremac-odjeli') {
-      return handleOtpremacOdjeli(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.limit);
+      result = handleOtpremacOdjeli(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.limit);
     } else if (path === 'odjeli-all') {
-      return handleOdjeliAll(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleOdjeliAll(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primac-detail-admin') {
-      return handlePrimacDetailAdmin(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.primacName);
+      result = handlePrimacDetailAdmin(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.primacName);
     } else if (path === 'primac-odjeli-admin') {
-      return handlePrimacOdjeliAdmin(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.primacName, e.parameter.limit);
+      result = handlePrimacOdjeliAdmin(e.parameter.year, e.parameter.username, e.parameter.password, e.parameter.primacName, e.parameter.limit);
     } else if (path === 'add-sjeca') {
-      return handleAddSjeca(e.parameter);
+      result = handleAddSjeca(e.parameter);
     } else if (path === 'add-otprema') {
-      return handleAddOtprema(e.parameter);
+      result = handleAddOtprema(e.parameter);
     } else if (path === 'pending-unosi') {
-      return handlePendingUnosi(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handlePendingUnosi(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'my-pending') {
-      return handleMyPending(e.parameter.username, e.parameter.password, e.parameter.tip);
+      result = handleMyPending(e.parameter.username, e.parameter.password, e.parameter.tip);
     } else if (path === 'update-pending') {
-      return handleUpdatePending(e.parameter);
+      result = handleUpdatePending(e.parameter);
     } else if (path === 'delete-pending') {
-      return handleDeletePending(e.parameter);
+      result = handleDeletePending(e.parameter);
     } else if (path === 'get-odjeli-list') {
-      return handleGetOdjeliList();
+      result = handleGetOdjeliList();
     } else if (path === 'mjesecni-sortimenti') {
-      return handleMjesecniSortimenti(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleMjesecniSortimenti(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primaci-daily') {
-      return handlePrimaciDaily(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
+      result = handlePrimaciDaily(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
     } else if (path === 'otpremaci-daily') {
-      return handleOtremaciDaily(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
+      result = handleOtremaciDaily(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
     } else if (path === 'daily-chart') {
-      return handleDailyChart(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
+      result = handleDailyChart(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
     } else if (path === 'stanje-odjela') {
-      return handleStanjeOdjela(e.parameter.username, e.parameter.password);
+      result = handleStanjeOdjela(e.parameter.username, e.parameter.password);
     } else if (path === 'sync-stanje-odjela') {
-      // Ručno osvježavanje cache-a za stanje odjela (samo za admin korisnike)
-      return handleSyncStanjeOdjela(e.parameter.username, e.parameter.password);
+      result = handleSyncStanjeOdjela(e.parameter.username, e.parameter.password);
     } else if (path === 'sync-index') {
-      // Ručno pokretanje indeksiranja INDEX sheet-ova (samo za admin korisnike)
-      return handleSyncIndex(e.parameter.username, e.parameter.password);
+      result = handleSyncIndex(e.parameter.username, e.parameter.password);
     } else if (path === 'primaci-by-radiliste') {
-      return handlePrimaciByRadiliste(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handlePrimaciByRadiliste(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primaci-by-izvodjac') {
-      return handlePrimaciByIzvodjac(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handlePrimaciByIzvodjac(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'primaci-sortimenti-by-primac') {
-      return handlePrimaciSortimentiByPrimac(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
+      result = handlePrimaciSortimentiByPrimac(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
     } else if (path === 'otpremaci-sortimenti-by-otpremac') {
-      return handleOtremaciSortimentiByOtpremac(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
+      result = handleOtremaciSortimentiByOtpremac(e.parameter.year, e.parameter.month, e.parameter.username, e.parameter.password);
     } else if (path === 'primke') {
-      return handlePrimke(e.parameter.username, e.parameter.password);
+      result = handlePrimke(e.parameter.username, e.parameter.password);
     } else if (path === 'otpreme') {
-      return handleOtpreme(e.parameter.username, e.parameter.password);
+      result = handleOtpreme(e.parameter.username, e.parameter.password);
     } else if (path === 'get_dinamika') {
-      return handleGetDinamika(e.parameter.year, e.parameter.username, e.parameter.password);
+      result = handleGetDinamika(e.parameter.year, e.parameter.username, e.parameter.password);
     } else if (path === 'manifest') {
-      // 📊 MANIFEST ENDPOINT - Brza provjera verzije podataka
-      return handleManifest();
+      result = handleManifest();
     } else if (path === 'manifest_data') {
-      // 📊 MANIFEST DATA ENDPOINT - Za delta sync (primka + otprema row counts)
-      return handleManifestData(e.parameter.username, e.parameter.password);
+      result = handleManifestData(e.parameter.username, e.parameter.password);
     } else if (path === 'delta_primka') {
-      // 🔄 DELTA PRIMKA - Vraća samo nove redove (fromRow do toRow)
-      return handleDeltaPrimka(e.parameter.username, e.parameter.password, e.parameter.fromRow, e.parameter.toRow);
+      result = handleDeltaPrimka(e.parameter.username, e.parameter.password, e.parameter.fromRow, e.parameter.toRow);
     } else if (path === 'delta_otprema') {
-      // 🔄 DELTA OTPREMA - Vraća samo nove redove (fromRow do toRow)
-      return handleDeltaOtprema(e.parameter.username, e.parameter.password, e.parameter.fromRow, e.parameter.toRow);
+      result = handleDeltaOtprema(e.parameter.username, e.parameter.password, e.parameter.fromRow, e.parameter.toRow);
     } else if (path === 'save_dinamika') {
       Logger.log('save_dinamika endpoint called');
       Logger.log('Parameters: ' + JSON.stringify(e.parameter));
-      return handleSaveDinamika(e.parameter.username, e.parameter.password, e.parameter.godina, e.parameter.mjeseci);
+      result = handleSaveDinamika(e.parameter.username, e.parameter.password, e.parameter.godina, e.parameter.mjeseci);
     } else if (path === 'stanje-zaliha') {
-      // 📦 STANJE ZALIHA - Čita podatke sa STANJE_ZALIHA sheeta (opciono filtrirano po poslovođi)
-      return handleStanjeZaliha(e.parameter.username, e.parameter.password, e.parameter.poslovodja);
+      result = handleStanjeZaliha(e.parameter.username, e.parameter.password, e.parameter.poslovodja);
     } else if (path === 'poslovodja-aktivnost') {
-      // 📅 POSLOVODJA AKTIVNOST - Zadnjih 5 dana sječa/otprema po odjelima (filtrirano po radilištu)
-      return handlePoslovodjaAktivnost(e.parameter.username, e.parameter.password, e.parameter.radiliste);
+      result = handlePoslovodjaAktivnost(e.parameter.username, e.parameter.password, e.parameter.radiliste);
     } else if (path === 'upload-image') {
-      // 📷 UPLOAD IMAGE - Upload slike na Google Drive (privremeno do 10h idućeg dana)
-      return handleUploadImage(e.parameter.username, e.parameter.password, e.parameter.type, e.parameter.imageData);
+      result = handleUploadImage(e.parameter.username, e.parameter.password, e.parameter.type, e.parameter.imageData);
     } else if (path === 'get-images') {
-      // 📷 GET IMAGES - Dohvati aktivne slike (za admina)
-      return handleGetImages(e.parameter.username, e.parameter.password);
+      result = handleGetImages(e.parameter.username, e.parameter.password);
     } else if (path === 'poslovodja-radilista') {
-      // 🗺️ POSLOVODJA RADILISTA - Dohvati mapping poslovodja→radilišta iz INFO sheeta
-      return handlePoslovodjaRadilista(e.parameter.username, e.parameter.password, e.parameter.poslovodja);
+      result = handlePoslovodjaRadilista(e.parameter.username, e.parameter.password, e.parameter.poslovodja);
+    } else {
+      Logger.log('Unknown path: ' + path);
+      result = createJsonResponse({ error: 'Unknown path: ' + path }, false);
     }
 
-    Logger.log('Unknown path: ' + path);
-    return createJsonResponse({ error: 'Unknown path: ' + path }, false);
+    // JSONP: ako je prisutan callback parametar, wrappuj odgovor
+    if (callback && result) {
+      var content = result.getContent();
+      return ContentService.createTextOutput(callback + '(' + content + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+
+    return result;
   } catch (error) {
     Logger.log('doGet error: ' + error.toString());
-    // Ako je ReferenceError (funkcija nije definisana), daj jasniju poruku
     if (error instanceof ReferenceError) {
       var errorMsg = error.toString() + '. Provjerite da su svi .gs fajlovi (api-handlers.gs, authentication.gs, config.gs, services.gs, utils-triggers.gs) dodani u Apps Script projekat.';
       return ContentService.createTextOutput(JSON.stringify({
