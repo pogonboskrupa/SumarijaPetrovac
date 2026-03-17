@@ -5,11 +5,11 @@
 // VAŽNO: Ažuriraj Spreadsheet ID-ove prema svom Google Drive okruženju
 
 // ⚠️ VAŽNO: Postavi svoje Spreadsheet ID-ove ovdje
-const KORISNICI_SPREADSHEET_ID = '1rpl0RiqsE6lrU9uDMTjf127By7b951rP3a5Chis9qwg'; // SUMARIJA_KORISNICI
+const KORISNICI_SPREADSHEET_ID = '1FdVo3MA-XP-7z-mWtOv7guR9a5RafJ3Hk0_xZhMaCOU'; // SUMARIJA_KORISNICI
 const INDEX_SPREADSHEET_ID = '1nPkSx2fCbtHGcwdq8rDo9A3dsSt9QpcF7f0JBCg1K1I';     // SUMARIJA_INDEX (zastarjelo)
-const BAZA_PODATAKA_ID = '1DIpllQlrMJwE9wpF1Gtwbnbh6ghYM5f1PimSK2gwVQQ';         // BAZA PODATAKA - glavni izvor
-const ODJELI_FOLDER_ID = '1NQ0s_F4j9iRDaZafexzP5Bwyv0NXfMMK';                      // Folder sa svim odjelima
-const IMAGES_FOLDER_ID = '1vtWCkjMoms4EO38zStZD9IADz859LmeI';                      // Folder za temp slike (auto-brisanje 5 dana)
+const BAZA_PODATAKA_ID = '19dJ-3kaay56KJe2gRDBd37OZjFvdLJ-omAGG1wenSYw';         // BAZA PODATAKA - glavni izvor
+const ODJELI_FOLDER_ID = '1sTfvrCI9-kozHt1xRlw5JNdieNk_Ic7c';                      // Folder sa svim odjelima
+const IMAGES_FOLDER_ID = '1dVjGZx0sxm0twY026FC_asp8RvebBOS-';                      // Folder za temp slike (auto-brisanje 5 dana)
 
 // Admin credentials
 const ADMIN_USERNAME = 'admin';

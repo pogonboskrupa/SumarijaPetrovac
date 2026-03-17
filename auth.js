@@ -103,7 +103,7 @@
                 ];
             } else if (userType === 'operativa') {
                 tabsConfig = [
-                    { id: 'dashboard', icon: '🌲', label: 'Šumarija Krupa', active: true },
+                    { id: 'dashboard', icon: '🌲', label: 'Šumarija Bosanski Petrovac', active: true },
                     { id: 'operativa', icon: '📊', label: 'Operativa & Analiza' },
                     { id: 'kupci', icon: '📦', label: 'Kupci' },
                     { id: 'mjesecni-sortimenti', icon: '📅', label: 'Mjesečni pregled' },
@@ -121,7 +121,7 @@
             } else {
                 // Admin / default user
                 tabsConfig = [
-                    { id: 'dashboard', icon: '🌲', label: 'Šumarija Krupa', active: true },
+                    { id: 'dashboard', icon: '🌲', label: 'Šumarija Bosanski Petrovac', active: true },
                     { id: 'kupci', icon: '🏢', label: 'Prikaz po kupcima' },
                     { id: 'stanje-zaliha', icon: '📦', label: 'Stanje Zaliha' },
                     { id: 'mjesecni-sortimenti', icon: '📅', label: 'Sječa/otprema' },

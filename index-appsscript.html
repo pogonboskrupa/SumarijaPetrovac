@@ -2062,7 +2062,7 @@
                 <div class="header-left">
                     <div class="header-title">
                         <p class="text-outline-firma" style="font-size: 20px; margin-bottom: 4px; letter-spacing: 0.5px;">ŠPD "UNSKO-SANSKE ŠUME" D.O.O. BOS.KRUPA</p>
-                        <h1>Pogon gospodarenja Bos. Krupa</h1>
+                        <h1>Šumarija Bosanski Petrovac</h1>
                         <p>Evidencija sječe i otpreme</p>
                     </div>
                 </div>
@@ -2098,7 +2098,7 @@
             <div class="loading-text">Učitavam podatke...</div>
         </div>
         
-        <!-- DASHBOARD CONTENT (Šumarija Krupa) -->
+        <!-- DASHBOARD CONTENT (Šumarija Bosanski Petrovac) -->
         <div id="dashboard-content" class="container hidden">
             <!-- Summary Cards -->
             <div class="summary-cards" id="summary-cards"></div>
@@ -5154,7 +5154,7 @@
             } else if (userType === 'operativa') {
                 // OPERATIVA korisnik vidi samo analytics dashboards
                 tabsMenu.innerHTML = `
-                    <button class="tab active" onclick="switchTab('dashboard')">🌲 Šumarija Krupa</button>
+                    <button class="tab active" onclick="switchTab('dashboard')">🌲 Šumarija Bosanski Petrovac</button>
                     <button class="tab" onclick="switchTab('operativa')">📊 Operativa & Analiza</button>
                     <button class="tab" onclick="switchTab('kupci')">📦 Kupci</button>
                     <button class="tab" onclick="switchTab('mjesecni-sortimenti')">📅 Mjesečni pregled</button>
@@ -5172,7 +5172,7 @@
             } else {
                 // Admin korisnici - bez OPERATIVA tab-a (admin se loguje kao OPERATIVA tip ako želi vidjeti operativa podatke)
                 tabsMenu.innerHTML = `
-                    <button class="tab active" onclick="switchTab('dashboard')">🌲 Šumarija Krupa</button>
+                    <button class="tab active" onclick="switchTab('dashboard')">🌲 Šumarija Bosanski Petrovac</button>
                     <button class="tab" onclick="switchTab('stanje-odjela-admin')">📦 Stanje odjela</button>
                     <button class="tab" onclick="switchTab('mjesecni-sortimenti')">📅 Sječa/otprema po mjesecima</button>
                     <button class="tab" onclick="switchTab('primaci')">👷 Prikaz sječe</button>
