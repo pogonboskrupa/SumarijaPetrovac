@@ -65,14 +65,46 @@
     <script src="notifications.js" defer></script>
 
     <script>
-        // Fix CORS: Google Apps Script redirects to auth if cookies are sent.
-        // Intercept all fetch calls to script.google.com and force credentials: 'omit'.
+        // Fix CORS: Google Apps Script ne šalje CORS headere na redirect lancu.
+        // JSONP zaobilazi CORS potpuno za sve GET zahtjeve ka script.google.com.
         (function() {
-            const _fetch = window.fetch;
+            function jsonpFetch(url) {
+                return new Promise(function(resolve, reject) {
+                    var cbName = '_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+                    var script = document.createElement('script');
+                    var timer = setTimeout(function() {
+                        cleanup();
+                        reject(new Error('JSONP timeout'));
+                    }, 30000);
+
+                    function cleanup() {
+                        clearTimeout(timer);
+                        delete window[cbName];
+                        if (script.parentNode) script.parentNode.removeChild(script);
+                    }
+
+                    window[cbName] = function(data) {
+                        cleanup();
+                        resolve({ ok: true, status: 200, json: function() { return Promise.resolve(data); } });
+                    };
+
+                    script.onerror = function() {
+                        cleanup();
+                        reject(new Error('Network error'));
+                    };
+
+                    var sep = url.indexOf('?') !== -1 ? '&' : '?';
+                    script.src = url + sep + 'callback=' + cbName;
+                    document.head.appendChild(script);
+                });
+            }
+
+            var _fetch = window.fetch;
             window.fetch = function(url, options) {
-                const urlStr = typeof url === 'string' ? url : (url && url.url) || '';
-                if (urlStr.includes('script.google.com')) {
-                    options = Object.assign({ credentials: 'omit' }, options);
+                var urlStr = typeof url === 'string' ? url : '';
+                var method = (options && options.method || 'GET').toUpperCase();
+                if (urlStr.indexOf('script.google.com') !== -1 && method !== 'POST') {
+                    return jsonpFetch(urlStr);
                 }
                 return _fetch.call(this, url, options);
             };
