@@ -68,14 +68,15 @@
         // Fix CORS: Google Apps Script ne šalje CORS headere na redirect lancu.
         // JSONP zaobilazi CORS potpuno za sve GET zahtjeve ka script.google.com.
         (function() {
-            function jsonpFetch(url) {
+            function jsonpFetch(url, timeoutMs) {
+                timeoutMs = timeoutMs || 15000;
                 return new Promise(function(resolve, reject) {
                     var cbName = '_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
                     var script = document.createElement('script');
                     var timer = setTimeout(function() {
                         cleanup();
-                        reject(new Error('JSONP timeout'));
-                    }, 30000);
+                        reject(new Error('Server ne odgovara. Provjerite internet vezu i pokušajte ponovo.'));
+                    }, timeoutMs);
 
                     function cleanup() {
                         clearTimeout(timer);
@@ -95,7 +96,7 @@
 
                     script.onerror = function() {
                         cleanup();
-                        reject(new Error('Network error'));
+                        reject(new Error('Greška u mreži. Provjerite internet vezu i pokušajte ponovo.'));
                     };
 
                     var sep = url.indexOf('?') !== -1 ? '&' : '?';
@@ -105,11 +106,14 @@
             }
 
             var _fetch = window.fetch;
+            window._nativeFetch = _fetch; // Expose for fallback use
             window.fetch = function(url, options) {
                 var urlStr = typeof url === 'string' ? url : '';
                 var method = (options && options.method || 'GET').toUpperCase();
                 if (urlStr.indexOf('script.google.com') !== -1 && method !== 'POST') {
-                    return jsonpFetch(urlStr);
+                    // Login requests: 15s timeout; other requests: 30s
+                    var isLogin = urlStr.indexOf('path=login') !== -1;
+                    return jsonpFetch(urlStr, isLogin ? 15000 : 30000);
                 }
                 return _fetch.call(this, url, options);
             };
