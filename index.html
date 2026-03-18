@@ -89,6 +89,7 @@
                         cleanup();
                         resolve({
                             ok: true, status: 200,
+                            headers: { get: function() { return 'application/json'; } },
                             json: function() { return Promise.resolve(data); },
                             text: function() { return Promise.resolve(JSON.stringify(data)); }
                         });
