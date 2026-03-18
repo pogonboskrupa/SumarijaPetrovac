@@ -65,10 +65,9 @@
     <script src="js/notifications.js" defer></script>
 
     <script>
-        // API fetch: Worker (CORS) → JSONP fallback direktno na GAS
+        // API fetch: JSONP direktno na GAS (bez Cloudflare Worker-a)
         (function() {
-            var WORKER_URL = 'https://sumarijapetrovac.sumarijabosanskipetrovac.workers.dev';
-            var GAS_URL    = 'https://script.google.com/macros/s/AKfycbyfAJJ-8rmOKcUKPLT3-yvV1V5DIYDL4M_hp6bcDDpXCdfzRc_LAUoGlz8zr6CPfa88/exec';
+            var GAS_URL = 'https://script.google.com/macros/s/AKfycbyfAJJ-8rmOKcUKPLT3-yvV1V5DIYDL4M_hp6bcDDpXCdfzRc_LAUoGlz8zr6CPfa88/exec';
 
             function jsonpFetch(url, timeoutMs) {
                 return new Promise(function(resolve, reject) {
@@ -108,35 +107,20 @@
 
             window.jsonpFetch = jsonpFetch;
 
-            // Override fetch: Worker GET zahtjevi → nativni fetch (Worker ima CORS)
-            // Ako Worker ne odgovori → JSONP direktno na GAS
+            // Override fetch: GET zahtjevi na GAS URL → JSONP (GAS nema CORS)
             var _origFetch = window.fetch;
             window.fetch = function(url, options) {
                 var urlStr = typeof url === 'string' ? url : (url && url.url ? url.url : '');
                 var method = (options && options.method || 'GET').toUpperCase();
 
-                if (urlStr.indexOf(WORKER_URL) === -1 || method !== 'GET') {
+                if (urlStr.indexOf(GAS_URL) === -1 || method !== 'GET') {
                     return _origFetch.apply(this, arguments);
                 }
 
                 var isLogin = urlStr.indexOf('path=login') !== -1;
                 var timeoutMs = isLogin ? 15000 : 30000;
 
-                var ctrl = new AbortController();
-                var timer = setTimeout(function() { ctrl.abort(); }, 10000);
-
-                return _origFetch(urlStr, { signal: ctrl.signal })
-                    .then(function(r) {
-                        clearTimeout(timer);
-                        if (r.ok) return r;
-                        throw new Error('Worker HTTP ' + r.status);
-                    })
-                    .catch(function(err) {
-                        clearTimeout(timer);
-                        console.warn('[API] Worker failed (' + err.message + '), JSONP fallback...');
-                        var gasUrl = urlStr.replace(WORKER_URL, GAS_URL);
-                        return jsonpFetch(gasUrl, timeoutMs);
-                    });
+                return jsonpFetch(urlStr, timeoutMs);
             };
         })();
 
