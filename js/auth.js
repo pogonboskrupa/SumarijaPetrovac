@@ -49,7 +49,11 @@
                     errorMsg.classList.remove('hidden');
                 }
             } catch (error) {
-                errorMsg.textContent = 'Greška u komunikaciji sa serverom: ' + error.message;
+                const isTimeout = error.message && (error.message.includes('timeout') || error.message.includes('odgovara'));
+                errorMsg.innerHTML = (isTimeout
+                    ? 'Server ne odgovara. Provjerite internet vezu.'
+                    : 'Greška pri prijavi: ' + error.message)
+                    + ' <button onclick="document.getElementById(\'login-form\').dispatchEvent(new Event(\'submit\'))" style="margin-left:8px;background:#166534;color:white;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:13px;">Pokušaj ponovo</button>';
                 errorMsg.classList.remove('hidden');
             } finally {
                 loginBtn.disabled = false;

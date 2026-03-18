@@ -7,9 +7,11 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0hIRdUYQH0P8i
 
 // 🌐 CORS konfiguriši dozvoljene domene (ili '*' za sve)
 const ALLOWED_ORIGINS = [
+  'https://sumarijabosanskipetrovac-cloud.github.io',
   'https://pogonboskrupa.github.io',
-  'http://localhost:5500',  // Za lokalni development
-  'http://127.0.0.1:5500'   // Za lokalni development
+  'https://www.sumarijaboskrupa.work',
+  'http://localhost:5500',
+  'http://127.0.0.1:5500'
 ];
 
 addEventListener('fetch', event => {
