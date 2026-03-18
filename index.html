@@ -85,7 +85,12 @@
 
                     window[cbName] = function(data) {
                         cleanup();
-                        resolve({ ok: true, status: 200, json: function() { return Promise.resolve(data); } });
+                        resolve({
+                            ok: true,
+                            status: 200,
+                            headers: { get: function(name) { return name.toLowerCase() === 'content-type' ? 'application/json' : null; } },
+                            json: function() { return Promise.resolve(data); }
+                        });
                     };
 
                     script.onerror = function() {
