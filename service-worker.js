@@ -8,8 +8,8 @@ const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/offline.html',
-    '/idb-helper.js',
-    '/data-sync.js',
+    '/js/idb-helper.js',
+    '/js/data-sync.js',
     '/js/notifications.js'
 ];
 

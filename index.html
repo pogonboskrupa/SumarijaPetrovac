@@ -16,21 +16,21 @@
     <link rel="manifest" href="manifest.webmanifest">
 
     <!-- Preload -->
-    <link rel="preload" href="main.css" as="style">
-    <link rel="preload" href="login-optimized.css" as="style">
-    <link rel="preload" href="cache-helper.js" as="script">
-    <link rel="preload" href="api-optimized.js" as="script">
+    <link rel="preload" href="css/main.css" as="style">
+    <link rel="preload" href="css/login-optimized.css" as="style">
+    <link rel="preload" href="js/cache-helper.js" as="script">
+    <link rel="preload" href="js/api-optimized.js" as="script">
 
     <!-- Favicon & Icons -->
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="alternate icon" type="image/png" href="favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="alternate icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="login-optimized.css">
-    <link rel="stylesheet" href="table-contrast-fix.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/login-optimized.css">
+    <link rel="stylesheet" href="css/table-contrast-fix.css">
 
     <!-- Google Fonts - Inter for numbers, Comfortaa for labels -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,25 +44,25 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.mini.min.js" defer></script>
 
     <!-- Performance Modules -->
-    <script src="cache-helper.js" defer></script>
-    <script src="api-optimized.js" defer></script>
+    <script src="js/cache-helper.js" defer></script>
+    <script src="js/api-optimized.js" defer></script>
 
     <!-- Fixes -->
-    <script src="week-fix.js" defer></script>
-    <script src="izvjestaji-new.js" defer></script>
+    <script src="js/week-fix.js" defer></script>
+    <script src="js/izvjestaji-new.js" defer></script>
 
     <!-- Offline-First -->
-    <script src="idb-helper.js" defer></script>
-    <script src="data-sync.js" defer></script>
+    <script src="js/idb-helper.js" defer></script>
+    <script src="js/data-sync.js" defer></script>
 
     <!-- App Modules -->
-    <script src="utils.js" defer></script>
-    <script src="app.js" defer></script>
-    <script src="auth.js" defer></script>
-    <script src="ui.js" defer></script>
-    <script src="drag-scroll.js" defer></script>
-    <script src="charts.js" defer></script>
-    <script src="notifications.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/drag-scroll.js" defer></script>
+    <script src="js/charts.js" defer></script>
+    <script src="js/notifications.js" defer></script>
 
     <script>
         // Fix CORS: Google Apps Script ne šalje CORS headere na redirect lancu.
@@ -157,7 +157,7 @@
     <div id="login-screen" class="login-container">
         <div class="login-box">
             <div class="logo-container">
-                <img src="logo-zuti.png" alt="ŠPD Unsko-Sanske Šume Logo">
+                <img src="assets/logo-zuti.png" alt="ŠPD Unsko-Sanske Šume Logo">
                 <h3 class="text-outline-firma">ŠPD "UNSKO-SANSKE ŠUME"</h3>
                 <h4 class="company-subtitle">BOSANSKA KRUPA</h4>
             </div>
@@ -298,7 +298,7 @@
                     <!-- Tabs will be dynamically populated based on user type -->
                 </nav>
                 <div class="sidebar-company-logo">
-                    <img src="logo-zuti.png" alt="ŠPD Unsko-Sanske Šume Logo" class="company-logo">
+                    <img src="assets/logo-zuti.png" alt="ŠPD Unsko-Sanske Šume Logo" class="company-logo">
                 </div>
                 <div class="sidebar-footer">
                     <div class="sidebar-user">
@@ -314,7 +314,7 @@
             <!-- MAIN CONTENT AREA -->
             <main class="main-content">
                 <div id="loading-screen" class="loading">
-            <div class="loading-icon"><img src="1773603789726.png" alt="Šumarija Bosanski Petrovac" style="width: 120px; height: auto;"></div>
+            <div class="loading-icon"><img src="assets/1773603789726.png" alt="Šumarija Bosanski Petrovac" style="width: 120px; height: auto;"></div>
             <div class="loading-text">Učitavam podatke...</div>
         </div>
 
