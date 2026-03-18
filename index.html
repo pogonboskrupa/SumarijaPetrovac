@@ -65,10 +65,10 @@
     <script src="js/notifications.js" defer></script>
 
     <script>
-        // API fetch - direktno na Google Apps Script
-        // Pokušava native fetch (GAS podržava CORS), fallback na JSONP
+        // API fetch: Worker (CORS) → JSONP fallback direktno na GAS
         (function() {
-            var GAS_URL = 'https://script.google.com/macros/s/AKfycbyfAJJ-8rmOKcUKPLT3-yvV1V5DIYDL4M_hp6bcDDpXCdfzRc_LAUoGlz8zr6CPfa88/exec';
+            var WORKER_URL = 'https://sumarijapetrovac.sumarijabosanskipetrovac.workers.dev';
+            var GAS_URL    = 'https://script.google.com/macros/s/AKfycbyfAJJ-8rmOKcUKPLT3-yvV1V5DIYDL4M_hp6bcDDpXCdfzRc_LAUoGlz8zr6CPfa88/exec';
 
             function jsonpFetch(url, timeoutMs) {
                 return new Promise(function(resolve, reject) {
@@ -97,7 +97,7 @@
 
                     script.onerror = function() {
                         cleanup();
-                        reject(new Error('JSONP_FAILED'));
+                        reject(new Error('Greška u mreži. Provjerite internet vezu.'));
                     };
 
                     var sep = url.indexOf('?') !== -1 ? '&' : '?';
@@ -108,44 +108,34 @@
 
             window.jsonpFetch = jsonpFetch;
 
-            // Override fetch: GET zahtjevi na GAS - pokušaj direktno, pa JSONP
+            // Override fetch: Worker GET zahtjevi → nativni fetch (Worker ima CORS)
+            // Ako Worker ne odgovori → JSONP direktno na GAS
             var _origFetch = window.fetch;
             window.fetch = function(url, options) {
                 var urlStr = typeof url === 'string' ? url : (url && url.url ? url.url : '');
                 var method = (options && options.method || 'GET').toUpperCase();
 
-                if (urlStr.indexOf(GAS_URL) === -1 || method !== 'GET') {
+                if (urlStr.indexOf(WORKER_URL) === -1 || method !== 'GET') {
                     return _origFetch.apply(this, arguments);
                 }
 
                 var isLogin = urlStr.indexOf('path=login') !== -1;
-                var totalTimeout = isLogin ? 15000 : 30000;
+                var timeoutMs = isLogin ? 15000 : 30000;
 
-                // Pokušaj direktan fetch (radi ako GAS ima CORS; brže od JSONP)
                 var ctrl = new AbortController();
-                var directTimer = setTimeout(function() { ctrl.abort(); }, 8000);
+                var timer = setTimeout(function() { ctrl.abort(); }, 10000);
 
                 return _origFetch(urlStr, { signal: ctrl.signal })
                     .then(function(r) {
-                        clearTimeout(directTimer);
-                        if (r.ok) {
-                            console.log('[API] Direct fetch OK');
-                            return r;
-                        }
-                        throw new Error('HTTP ' + r.status);
+                        clearTimeout(timer);
+                        if (r.ok) return r;
+                        throw new Error('Worker HTTP ' + r.status);
                     })
                     .catch(function(err) {
-                        clearTimeout(directTimer);
-                        // CORS greška ili abort → fallback na JSONP
-                        console.warn('[API] Direct fetch failed (' + err.message + '), pokušavam JSONP...');
-                        return jsonpFetch(urlStr, totalTimeout);
-                    })
-                    .catch(function(err) {
-                        // I JSONP je pao
-                        var msg = err.message === 'JSONP_FAILED'
-                            ? 'Greška u mreži. Provjerite internet vezu.'
-                            : err.message;
-                        throw new Error(msg);
+                        clearTimeout(timer);
+                        console.warn('[API] Worker failed (' + err.message + '), JSONP fallback...');
+                        var gasUrl = urlStr.replace(WORKER_URL, GAS_URL);
+                        return jsonpFetch(gasUrl, timeoutMs);
                     });
             };
         })();
