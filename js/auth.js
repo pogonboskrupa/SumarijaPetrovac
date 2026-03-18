@@ -17,36 +17,18 @@
             try {
                 const loginUrl = `${API_URL}?path=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
 
-                // Race JSONP (intercepted fetch) and native fetch in parallel
-                // JSONP bypasses CORS via <script> tag injection
-                // Native fetch may work on some devices where JSONP fails
-                const jsonpPromise = fetch(loginUrl).then(r => r.json());
-
-                const nativePromise = (async () => {
-                    const nativeFetch = window._nativeFetch;
-                    if (!nativeFetch || nativeFetch === window.fetch) throw new Error('No native fetch');
-                    const ctrl = new AbortController();
-                    const timer = setTimeout(() => ctrl.abort(), 14000);
-                    try {
-                        const r = await nativeFetch(loginUrl, { credentials: 'omit', signal: ctrl.signal });
-                        clearTimeout(timer);
-                        return await r.json();
-                    } catch (err) {
-                        clearTimeout(timer);
-                        throw err;
-                    }
-                })();
-
-                // First success wins; only fail if both fail
-                const data = await (typeof Promise.any === 'function'
-                    ? Promise.any([jsonpPromise, nativePromise])
-                    : new Promise((resolve, reject) => {
-                        let errors = [];
-                        [jsonpPromise, nativePromise].forEach(p => p.then(resolve).catch(err => {
-                            errors.push(err);
-                            if (errors.length === 2) reject(errors[0]);
-                        }));
-                    }));
+                // Cloudflare Worker handles CORS - plain fetch works on all devices
+                const ctrl = new AbortController();
+                const timer = setTimeout(() => ctrl.abort(), 15000);
+                let data;
+                try {
+                    const r = await fetch(loginUrl, { signal: ctrl.signal });
+                    clearTimeout(timer);
+                    data = await r.json();
+                } catch (err) {
+                    clearTimeout(timer);
+                    throw err;
+                }
 
                 if (data.success) {
                     currentUser = data;
@@ -79,17 +61,11 @@
                     errorMsg.classList.remove('hidden');
                 }
             } catch (error) {
-                // AggregateError (Promise.any all failed) - extract individual errors
-                let displayMsg;
-                if (error.errors && error.errors.length) {
-                    const msgs = error.errors.map(e => e && e.message || String(e)).join(' | ');
-                    console.error('[LOGIN] All approaches failed:', msgs, error.errors);
-                    displayMsg = 'Server nije dostupan. ' + msgs;
-                } else {
-                    const isTimeout = error.message && (error.message.includes('timeout') || error.message.includes('odgovara'));
-                    displayMsg = isTimeout ? 'Server ne odgovara. Provjerite internet vezu.' : 'Greška pri prijavi: ' + error.message;
-                    console.error('[LOGIN] Error:', error.message, error);
-                }
+                const isTimeout = error.name === 'AbortError' || (error.message && error.message.includes('abort'));
+                const displayMsg = isTimeout
+                    ? 'Server ne odgovara. Provjerite internet vezu i pokušajte ponovo.'
+                    : 'Greška pri prijavi: ' + error.message;
+                console.error('[LOGIN] Error:', error.message, error);
                 errorMsg.innerHTML = displayMsg
                     + ' <button onclick="document.getElementById(\'login-form\').dispatchEvent(new Event(\'submit\'))" style="margin-left:8px;background:#166534;color:white;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:13px;">Pokušaj ponovo</button>';
                 errorMsg.classList.remove('hidden');

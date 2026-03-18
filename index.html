@@ -65,59 +65,8 @@
     <script src="js/notifications.js" defer></script>
 
     <script>
-        // Fix CORS: Google Apps Script ne šalje CORS headere na redirect lancu.
-        // JSONP zaobilazi CORS potpuno za sve GET zahtjeve ka script.google.com.
-        (function() {
-            function jsonpFetch(url, timeoutMs) {
-                timeoutMs = timeoutMs || 15000;
-                return new Promise(function(resolve, reject) {
-                    var cbName = '_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-                    var script = document.createElement('script');
-                    var timer = setTimeout(function() {
-                        cleanup();
-                        reject(new Error('Server ne odgovara. Provjerite internet vezu i pokušajte ponovo.'));
-                    }, timeoutMs);
-
-                    function cleanup() {
-                        clearTimeout(timer);
-                        delete window[cbName];
-                        if (script.parentNode) script.parentNode.removeChild(script);
-                    }
-
-                    window[cbName] = function(data) {
-                        cleanup();
-                        resolve({
-                            ok: true,
-                            status: 200,
-                            headers: { get: function(name) { return name.toLowerCase() === 'content-type' ? 'application/json' : null; } },
-                            json: function() { return Promise.resolve(data); }
-                        });
-                    };
-
-                    script.onerror = function() {
-                        cleanup();
-                        reject(new Error('Greška u mreži. Provjerite internet vezu i pokušajte ponovo.'));
-                    };
-
-                    var sep = url.indexOf('?') !== -1 ? '&' : '?';
-                    script.src = url + sep + 'callback=' + cbName;
-                    document.head.appendChild(script);
-                });
-            }
-
-            var _fetch = window.fetch;
-            window._nativeFetch = _fetch; // Expose for fallback use
-            window.fetch = function(url, options) {
-                var urlStr = typeof url === 'string' ? url : '';
-                var method = (options && options.method || 'GET').toUpperCase();
-                if (urlStr.indexOf('script.google.com') !== -1 && method !== 'POST') {
-                    // Login requests: 15s timeout; other requests: 30s
-                    var isLogin = urlStr.indexOf('path=login') !== -1;
-                    return jsonpFetch(urlStr, isLogin ? 15000 : 30000);
-                }
-                return _fetch.call(this, url, options);
-            };
-        })();
+        // API pozivi idu kroz Cloudflare Worker koji dodaje CORS headere
+        // - nema potrebe za JSONP interceptorom
 
         let chartJsLoaded = false;
         window.loadChartJs = function() {
