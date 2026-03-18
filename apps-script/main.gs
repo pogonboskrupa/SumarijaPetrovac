@@ -42,10 +42,16 @@ function doGet(e) {
       Logger.log('GREŠKA: Nedostaju funkcije: ' + missingFunctions.join(', '));
       Logger.log('Provjerite da su svi .gs fajlovi dodani u Apps Script projekat:');
       Logger.log('- main.gs, api-handlers.gs, authentication.gs, config.gs, services.gs, utils-triggers.gs');
-      return ContentService.createTextOutput(JSON.stringify({
+      var earlyErrorJson = JSON.stringify({
         success: false,
         error: 'Nedostaju funkcije: ' + missingFunctions.join(', ') + '. Provjerite da su svi .gs fajlovi (api-handlers.gs, authentication.gs, config.gs, services.gs, utils-triggers.gs) dodani u Apps Script projekat.'
-      })).setMimeType(ContentService.MimeType.JSON);
+      });
+      var earlyCb = e && e.parameter && e.parameter.callback;
+      if (earlyCb) {
+        return ContentService.createTextOutput(earlyCb + '(' + earlyErrorJson + ')')
+          .setMimeType(ContentService.MimeType.JAVASCRIPT);
+      }
+      return ContentService.createTextOutput(earlyErrorJson).setMimeType(ContentService.MimeType.JSON);
     }
 
     Logger.log('=== DOGET CALLED ===');
@@ -174,14 +180,22 @@ function doGet(e) {
     return result;
   } catch (error) {
     Logger.log('doGet error: ' + error.toString());
+    var catchCb = e && e.parameter && e.parameter.callback;
     if (error instanceof ReferenceError) {
-      var errorMsg = error.toString() + '. Provjerite da su svi .gs fajlovi (api-handlers.gs, authentication.gs, config.gs, services.gs, utils-triggers.gs) dodani u Apps Script projekat.';
-      return ContentService.createTextOutput(JSON.stringify({
-        success: false,
-        error: errorMsg
-      })).setMimeType(ContentService.MimeType.JSON);
+      var refErrorMsg = error.toString() + '. Provjerite da su svi .gs fajlovi (api-handlers.gs, authentication.gs, config.gs, services.gs, utils-triggers.gs) dodani u Apps Script projekat.';
+      var refErrorJson = JSON.stringify({ success: false, error: refErrorMsg });
+      if (catchCb) {
+        return ContentService.createTextOutput(catchCb + '(' + refErrorJson + ')')
+          .setMimeType(ContentService.MimeType.JAVASCRIPT);
+      }
+      return ContentService.createTextOutput(refErrorJson).setMimeType(ContentService.MimeType.JSON);
     }
-    return createJsonResponse({ error: error.toString() }, false);
+    var catchResult = createJsonResponse({ error: error.toString() }, false);
+    if (catchCb && catchResult) {
+      return ContentService.createTextOutput(catchCb + '(' + catchResult.getContent() + ')')
+        .setMimeType(ContentService.MimeType.JAVASCRIPT);
+    }
+    return catchResult;
   }
 }
 

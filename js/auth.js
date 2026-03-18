@@ -15,8 +15,38 @@
             loginBtn.textContent = 'Prijavljivanje...';
 
             try {
-                const response = await fetch(`${API_URL}?path=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`);
-                const data = await response.json();
+                const loginUrl = `${API_URL}?path=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+
+                // Race JSONP (intercepted fetch) and native fetch in parallel
+                // JSONP bypasses CORS via <script> tag injection
+                // Native fetch may work on some devices where JSONP fails
+                const jsonpPromise = fetch(loginUrl).then(r => r.json());
+
+                const nativePromise = (async () => {
+                    const nativeFetch = window._nativeFetch;
+                    if (!nativeFetch || nativeFetch === window.fetch) throw new Error('No native fetch');
+                    const ctrl = new AbortController();
+                    const timer = setTimeout(() => ctrl.abort(), 14000);
+                    try {
+                        const r = await nativeFetch(loginUrl, { credentials: 'omit', signal: ctrl.signal });
+                        clearTimeout(timer);
+                        return await r.json();
+                    } catch (err) {
+                        clearTimeout(timer);
+                        throw err;
+                    }
+                })();
+
+                // First success wins; only fail if both fail
+                const data = await (typeof Promise.any === 'function'
+                    ? Promise.any([jsonpPromise, nativePromise])
+                    : new Promise((resolve, reject) => {
+                        let errors = [];
+                        [jsonpPromise, nativePromise].forEach(p => p.then(resolve).catch(err => {
+                            errors.push(err);
+                            if (errors.length === 2) reject(errors[0]);
+                        }));
+                    }));
 
                 if (data.success) {
                     currentUser = data;
